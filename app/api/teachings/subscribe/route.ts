@@ -10,10 +10,10 @@
  * 3. Returns success/error response
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { validateSubscribeRequest } from '@/lib/validation';
-import { sendSubscriptionNotification } from '@/lib/email';
-import type { SubscribeResponse } from '@/types/newsletter';
+import {NextRequest, NextResponse} from "next/server";
+import {validateSubscribeRequest} from "@/lib/validation";
+import {sendSubscriptionNotification} from "@/lib/email";
+import type {SubscribeResponse} from "@/types/teachings";
 
 /**
  * POST handler for newsletter subscription
@@ -33,11 +33,13 @@ import type { SubscribeResponse } from '@/types/newsletter';
  * - 400: Invalid email format or missing email
  * - 500: Server error (email service failure)
  */
-export async function POST(request: NextRequest): Promise<NextResponse<SubscribeResponse>> {
+export async function POST(
+  request: NextRequest,
+): Promise<NextResponse<SubscribeResponse>> {
   try {
     // Step 1: Parse the request body
     const body = await request.json();
-    const { email } = body;
+    const {email} = body;
 
     // Step 2: Validate the email
     const validation = validateSubscribeRequest(email);
@@ -47,9 +49,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<Subscribe
       return NextResponse.json(
         {
           success: false,
-          message: validation.error || 'Invalid email address',
+          message: validation.error || "Invalid email address",
         },
-        { status: 400 }
+        {status: 400},
       );
     }
 
@@ -60,14 +62,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<Subscribe
 
     if (!emailResult.success) {
       // Return 500 Internal Server Error for email service failures
-      console.error('Email service failed:', emailResult.error);
+      console.error("Email service failed:", emailResult.error);
       return NextResponse.json(
         {
           success: false,
-          message: 'Unable to process your subscription. Please try again later.',
+          message:
+            "Unable to process your subscription. Please try again later.",
           error: emailResult.error,
         },
-        { status: 500 }
+        {status: 500},
       );
     }
 
@@ -75,21 +78,21 @@ export async function POST(request: NextRequest): Promise<NextResponse<Subscribe
     return NextResponse.json(
       {
         success: true,
-        message: 'Thank you for subscribing! We\'ll be in touch soon.',
+        message: "Thank you for subscribing! We'll be in touch soon.",
       },
-      { status: 200 }
+      {status: 200},
     );
   } catch (error) {
     // Handle unexpected errors (e.g., invalid JSON in request body)
-    console.error('Subscription error:', error);
+    console.error("Subscription error:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: 'An unexpected error occurred. Please try again.',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        message: "An unexpected error occurred. Please try again.",
+        error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      {status: 500},
     );
   }
 }
